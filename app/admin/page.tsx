@@ -3,9 +3,10 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Users, FileText, TrendingUp, Settings, Check, X, Search, Clock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Users, FileText, TrendingUp, Settings, Check, X, Search, Clock, AlertCircle, CheckCircle2, Sparkles } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import Link from "next/link";
+import { useDemo } from "@/lib/demo-context";
 
 interface ServiceRequest {
     id: string;
@@ -19,13 +20,62 @@ interface ServiceRequest {
     };
 }
 
+// Demo admin requests for demo mode
+const DEMO_ADMIN_REQUESTS: ServiceRequest[] = [
+    {
+        id: "admin-req-001",
+        title: "Commercial License Renewal",
+        status: "Pending",
+        createdAt: "2024-01-15T10:30:00Z",
+        type: "Government",
+        user: { name: "Ahmed Al-Rashid", email: "ahmed@company.sa" }
+    },
+    {
+        id: "admin-req-002",
+        title: "Employee Visa Processing",
+        status: "In Progress",
+        createdAt: "2024-01-14T14:20:00Z",
+        type: "HR",
+        user: { name: "Fatima Al-Hassan", email: "fatima@startup.sa" }
+    },
+    {
+        id: "admin-req-003",
+        title: "Quarterly Tax Filing",
+        status: "Completed",
+        createdAt: "2024-01-12T09:15:00Z",
+        type: "Accounting",
+        user: { name: "Omar Trading Co.", email: "finance@omar-trading.sa" }
+    },
+    {
+        id: "admin-req-004",
+        title: "Contract Review - Partnership Agreement",
+        status: "Pending",
+        createdAt: "2024-01-16T11:45:00Z",
+        type: "Legal",
+        user: { name: "Saudi Tech Solutions", email: "legal@sauditech.sa" }
+    },
+    {
+        id: "admin-req-005",
+        title: "Nitaqat Compliance Review",
+        status: "In Progress",
+        createdAt: "2024-01-13T16:00:00Z",
+        type: "Government",
+        user: { name: "Riyadh Consulting", email: "hr@riyadhconsulting.sa" }
+    }
+];
+
 export default function AdminDashboard() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const { t } = useLanguage();
+    const { isDemoMode, demoUser } = useDemo();
 
     const [requests, setRequests] = useState<ServiceRequest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Check if user is authenticated via session or demo mode (as admin)
+    const isAdmin = isDemoMode ? demoUser?.role === "ADMIN" : session?.user?.role === "ADMIN";
+    const currentUser = isDemoMode ? demoUser : session?.user;
 
     // Mock Admin Data for stats (could be real later)
     const [stats, setStats] = useState([
@@ -35,18 +85,37 @@ export default function AdminDashboard() {
     ]);
 
     useEffect(() => {
+        if (status === "loading") return;
+
+        if (isDemoMode) {
+            // Check if demo user is admin
+            if (demoUser?.role !== "ADMIN") {
+                router.push("/dashboard");
+                return;
+            }
+            // Use demo admin requests
+            setRequests(DEMO_ADMIN_REQUESTS);
+            setStats(prev => prev.map(s =>
+                s.label === "Active Requests" ? { ...s, value: DEMO_ADMIN_REQUESTS.length.toString() } : s
+            ));
+            setIsLoading(false);
+            return;
+        }
+
         if (status === "unauthenticated") {
             router.push("/login");
+            return;
         }
+
         if (status === "authenticated") {
             // Check role
-            if (session.user.role !== "ADMIN") {
+            if (session?.user?.role !== "ADMIN") {
                 router.push("/dashboard"); // Redirect non-admins
                 return;
             }
             fetchRequests();
         }
-    }, [status, router, session]);
+    }, [status, router, session, isDemoMode, demoUser]);
 
     const fetchRequests = async () => {
         try {
@@ -67,8 +136,17 @@ export default function AdminDashboard() {
     };
 
     const handleAction = async (id: string, action: 'approve' | 'reject') => {
+        const newStatus = action === 'approve' ? 'In Progress' : 'Rejected';
+
+        if (isDemoMode) {
+            // Handle demo mode action
+            setRequests(requests.map(req =>
+                req.id === id ? { ...req, status: newStatus } : req
+            ));
+            return;
+        }
+
         try {
-            const newStatus = action === 'approve' ? 'In Progress' : 'Rejected';
             const res = await fetch(`/api/requests/${id}`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
@@ -86,10 +164,18 @@ export default function AdminDashboard() {
     };
 
     if (status === "loading" || isLoading) {
-        return <div className="min-h-screen flex items-center justify-center bg-muted/10">Loading Admin Portal...</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-muted-foreground">Loading Admin Portal...</p>
+                </div>
+            </div>
+        );
     }
 
-    if (!session) return null;
+    if (!isDemoMode && !session) return null;
+    if (!isAdmin) return null;
 
     return (
         <div className="min-h-screen bg-muted/10 flex">
@@ -116,11 +202,17 @@ export default function AdminDashboard() {
                     </a>
                 </nav>
                 <div className="p-4 border-t border-border">
+                    {isDemoMode && (
+                        <div className="flex items-center gap-2 px-4 py-2 mb-2 bg-primary/10 border border-primary/20 rounded-xl">
+                            <Sparkles className="w-3.5 h-3.5 text-primary" />
+                            <span className="text-xs font-medium text-primary">Demo Mode</span>
+                        </div>
+                    )}
                     <div className="flex items-center gap-3 px-4 py-3">
                         <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">A</div>
                         <div>
-                            <p className="text-sm font-medium text-foreground">{session.user.name}</p>
-                            <p className="text-xs text-muted-foreground">{session.user.email}</p>
+                            <p className="text-sm font-medium text-foreground">{currentUser?.name}</p>
+                            <p className="text-xs text-muted-foreground">{currentUser?.email}</p>
                         </div>
                     </div>
                 </div>

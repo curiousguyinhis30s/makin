@@ -6,6 +6,7 @@ import Footer from "@/components/organisms/Footer";
 import { LanguageProvider } from "@/lib/i18n";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SessionProvider } from "@/components/SessionProvider";
+import { DemoProvider } from "@/lib/demo-context";
 import Chatbot from "@/components/organisms/Chatbot";
 
 const geistSans = Geist({
@@ -70,14 +71,16 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <SessionProvider>
-            <LanguageProvider>
-              <Navbar />
-              <main className="min-h-screen">
-                {children}
-              </main>
-              <Footer />
-              <Chatbot />
-            </LanguageProvider>
+            <DemoProvider>
+              <LanguageProvider>
+                <Navbar />
+                <main className="min-h-screen">
+                  {children}
+                </main>
+                <Footer />
+                <Chatbot />
+              </LanguageProvider>
+            </DemoProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>

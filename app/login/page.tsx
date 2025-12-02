@@ -5,14 +5,16 @@ import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft, User, Shield } from "lucide-react";
+import { ArrowLeft, User, Shield, Sparkles } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
+import { useDemo } from "@/lib/demo-context";
 
 function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
     const { t, direction } = useLanguage();
+    const { enableDemoMode } = useDemo();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -110,6 +112,50 @@ function LoginForm() {
                             {error}
                         </div>
                     )}
+
+                    {/* Demo Mode Quick Access */}
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-border" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">Quick Demo Access</span>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                enableDemoMode("USER");
+                                router.push("/dashboard");
+                            }}
+                            className="w-full flex items-center justify-center px-4 py-3 bg-primary/10 border border-primary/30 rounded-xl text-sm font-medium text-primary hover:bg-primary/20 transition-colors"
+                        >
+                            <Sparkles className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                            Demo User
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                enableDemoMode("ADMIN");
+                                router.push("/admin");
+                            }}
+                            className="w-full flex items-center justify-center px-4 py-3 bg-secondary border border-border rounded-xl text-sm font-medium text-foreground hover:bg-secondary/80 transition-colors"
+                        >
+                            <Shield className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                            Demo Admin
+                        </button>
+                    </div>
+
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-border" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">Or sign in</span>
+                        </div>
+                    </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <button

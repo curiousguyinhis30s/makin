@@ -3,10 +3,11 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CreditCard, User, Calendar, Shield, Plus, X, FileText, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { CreditCard, User, Calendar, Shield, Plus, X, FileText, Clock, CheckCircle2, AlertCircle, Sparkles, Scale } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useDemo } from "@/lib/demo-context";
 
 interface ServiceRequest {
     id: string;
@@ -21,6 +22,7 @@ export default function CustomerDashboard() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const { t } = useLanguage();
+    const { isDemoMode, demoUser, demoRequests, addDemoRequest } = useDemo();
 
     const container = {
         hidden: { opacity: 0 },
@@ -45,14 +47,33 @@ export default function CustomerDashboard() {
     const [newRequest, setNewRequest] = useState({ type: "HR", title: "", description: "" });
     const [expandedId, setExpandedId] = useState<string | null>(null);
 
+    // Check if user is authenticated via session or demo mode
+    const isAuthenticated = session || isDemoMode;
+    const currentUser = isDemoMode ? demoUser : session?.user;
+
     useEffect(() => {
-        if (status === "unauthenticated") {
+        if (status === "loading") return;
+
+        if (!isDemoMode && status === "unauthenticated") {
             router.push("/login");
+            return;
         }
-        if (status === "authenticated") {
+
+        if (isDemoMode) {
+            // Use demo requests
+            setActiveServices(demoRequests.map(req => ({
+                id: req.id,
+                title: req.title,
+                status: req.status,
+                createdAt: req.createdAt,
+                type: req.type,
+                description: req.description
+            })));
+            setIsLoading(false);
+        } else if (status === "authenticated") {
             fetchRequests();
         }
-    }, [status, router]);
+    }, [status, router, isDemoMode, demoRequests]);
 
     const fetchRequests = async () => {
         try {
@@ -69,13 +90,37 @@ export default function CustomerDashboard() {
     };
 
     if (status === "loading" || isLoading) {
-        return <div className="min-h-screen flex items-center justify-center bg-muted/10">Loading...</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-muted-foreground">Loading dashboard...</p>
+                </div>
+            </div>
+        );
     }
 
-    if (!session) return null;
+    if (!isAuthenticated) return null;
 
     const handleSubmitRequest = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (isDemoMode) {
+            // Handle demo mode request creation
+            const newDemoRequest = {
+                id: `req-demo-${Date.now()}`,
+                title: newRequest.title || `${newRequest.type} Service Request`,
+                type: newRequest.type,
+                status: "Pending",
+                createdAt: new Date().toISOString(),
+                description: newRequest.description
+            };
+            addDemoRequest(newDemoRequest);
+            setActiveServices([newDemoRequest, ...activeServices]);
+            setIsRequestModalOpen(false);
+            setNewRequest({ type: "HR", title: "", description: "" });
+            return;
+        }
 
         try {
             const res = await fetch("/api/requests", {
@@ -110,9 +155,15 @@ export default function CustomerDashboard() {
                     <p className="text-sm text-muted-foreground">Manage your business operations and track service requests.</p>
                 </div>
                 <div className="flex items-center gap-4">
+                    {isDemoMode && (
+                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full">
+                            <Sparkles className="w-3.5 h-3.5 text-primary" />
+                            <span className="text-xs font-medium text-primary">Demo Mode</span>
+                        </div>
+                    )}
                     <div className="hidden md:block text-right">
-                        <p className="text-sm font-medium text-foreground">{session.user.name}</p>
-                        <p className="text-xs text-muted-foreground">{session.user.email}</p>
+                        <p className="text-sm font-medium text-foreground">{currentUser?.name}</p>
+                        <p className="text-xs text-muted-foreground">{currentUser?.email}</p>
                     </div>
                     <button
                         onClick={() => setIsRequestModalOpen(true)}
@@ -164,10 +215,12 @@ export default function CustomerDashboard() {
                                             <div className="flex items-start gap-4">
                                                 <div className={`p-3 rounded-xl shrink-0 ${service.type === 'Government' ? 'bg-blue-500/10 text-blue-600' :
                                                     service.type === 'HR' ? 'bg-purple-500/10 text-purple-600' :
+                                                    service.type === 'Legal' ? 'bg-green-500/10 text-green-600' :
                                                         'bg-orange-500/10 text-orange-600'
                                                     }`}>
                                                     {service.type === 'Government' ? <Shield className="w-5 h-5" /> :
                                                         service.type === 'HR' ? <User className="w-5 h-5" /> :
+                                                        service.type === 'Legal' ? <Scale className="w-5 h-5" /> :
                                                             <CreditCard className="w-5 h-5" />}
                                                 </div>
                                                 <div>
@@ -215,18 +268,24 @@ export default function CustomerDashboard() {
                         <div className="bg-card rounded-[2rem] p-6 h-full">
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-purple-600 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/20">
-                                    {session.user.name?.[0] || "U"}
+                                    {currentUser?.name?.[0] || "U"}
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-foreground text-base">{session.user.name}</h3>
-                                    <p className="text-xs text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full inline-block mt-1">Premium Member</p>
+                                    <h3 className="font-bold text-foreground text-base">{currentUser?.name}</h3>
+                                    <p className="text-xs text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full inline-block mt-1">
+                                        {isDemoMode ? demoUser?.plan : "Premium Member"}
+                                    </p>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center text-sm p-4 bg-background/50 border border-border rounded-xl hover:border-primary/30 transition-colors">
                                     <span className="text-muted-foreground">{t("dashboard.memberSince")}</span>
-                                    <span className="font-medium text-foreground">{new Date().toLocaleDateString()}</span>
+                                    <span className="font-medium text-foreground">
+                                        {isDemoMode && demoUser?.memberSince
+                                            ? new Date(demoUser.memberSince).toLocaleDateString()
+                                            : new Date().toLocaleDateString()}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between items-center text-sm p-4 bg-background/50 border border-border rounded-xl hover:border-primary/30 transition-colors">
                                     <span className="text-muted-foreground">{t("dashboard.activeServices")}</span>

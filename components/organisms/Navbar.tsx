@@ -1,14 +1,15 @@
 "use client";
 
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, Sparkles, LogOut } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import LanguageSwitcher from "@/components/molecules/LanguageSwitcher";
+import { useDemo } from "@/lib/demo-context";
 
 export default function Navbar() {
     const { t } = useLanguage();
@@ -18,6 +19,10 @@ export default function Navbar() {
     const { data: session } = useSession();
     const { scrollY } = useScroll();
     const { theme, setTheme } = useTheme();
+    const { isDemoMode, demoUser, disableDemoMode } = useDemo();
+
+    // Check if user is authenticated via session or demo mode
+    const isAuthenticated = session || isDemoMode;
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         const previous = scrollY.getPrevious() || 0;
@@ -89,13 +94,36 @@ export default function Navbar() {
                         </button>
                         <LanguageSwitcher />
 
-                        {session ? (
-                            <Link
-                                href="/dashboard"
-                                className="btn-primary text-sm px-5 py-2.5 shadow-md hover:shadow-primary/20"
-                            >
-                                {t("nav.dashboard")}
-                            </Link>
+                        {isDemoMode && (
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full">
+                                <Sparkles className="w-3.5 h-3.5 text-primary" />
+                                <span className="text-xs font-medium text-primary">Demo</span>
+                            </div>
+                        )}
+
+                        {isAuthenticated ? (
+                            <div className="flex items-center gap-2">
+                                <Link
+                                    href={isDemoMode && demoUser?.role === "ADMIN" ? "/admin" : "/dashboard"}
+                                    className="btn-primary text-sm px-5 py-2.5 shadow-md hover:shadow-primary/20"
+                                >
+                                    {t("nav.dashboard")}
+                                </Link>
+                                <button
+                                    onClick={() => {
+                                        if (isDemoMode) {
+                                            disableDemoMode();
+                                        } else {
+                                            signOut({ callbackUrl: "/" });
+                                        }
+                                    }}
+                                    className="p-2.5 rounded-xl border border-border/50 hover:border-red-500 hover:bg-red-500/10 transition-all duration-200"
+                                    aria-label="Sign out"
+                                    title={isDemoMode ? "Exit Demo Mode" : "Sign Out"}
+                                >
+                                    <LogOut className="w-4 h-4 text-foreground" />
+                                </button>
+                            </div>
                         ) : (
                             <Link
                                 href="/register"
@@ -149,14 +177,35 @@ export default function Navbar() {
                             </button>
                             <LanguageSwitcher />
                         </div>
-                        {session ? (
-                            <Link
-                                href="/dashboard"
-                                className="block w-full text-center px-4 py-3 mt-4 text-base font-semibold text-primary-foreground bg-primary rounded-lg hover:bg-primary/90"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                {t("nav.dashboard")}
-                            </Link>
+                        {isDemoMode && (
+                            <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 border border-primary/20 rounded-lg mt-2">
+                                <Sparkles className="w-4 h-4 text-primary" />
+                                <span className="text-sm font-medium text-primary">Demo Mode Active</span>
+                            </div>
+                        )}
+                        {isAuthenticated ? (
+                            <div className="space-y-2 mt-4">
+                                <Link
+                                    href={isDemoMode && demoUser?.role === "ADMIN" ? "/admin" : "/dashboard"}
+                                    className="block w-full text-center px-4 py-3 text-base font-semibold text-primary-foreground bg-primary rounded-lg hover:bg-primary/90"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                >
+                                    {t("nav.dashboard")}
+                                </Link>
+                                <button
+                                    onClick={() => {
+                                        if (isDemoMode) {
+                                            disableDemoMode();
+                                        } else {
+                                            signOut({ callbackUrl: "/" });
+                                        }
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className="block w-full text-center px-4 py-3 text-base font-semibold text-foreground bg-secondary rounded-lg hover:bg-secondary/80"
+                                >
+                                    {isDemoMode ? "Exit Demo Mode" : "Sign Out"}
+                                </button>
+                            </div>
                         ) : (
                             <Link
                                 href="/register"

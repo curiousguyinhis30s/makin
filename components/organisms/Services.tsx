@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/i18n";
+import Link from "next/link";
 
 // Custom SVG icons for better visual appeal
 const HRIcon = ({ className }: { className?: string }) => (
@@ -60,6 +61,7 @@ export default function Services() {
                 t("services.hr.f4"),
             ],
             className: "lg:col-span-2 bg-card",
+            href: "/services/hr",
         },
         {
             icon: GovIcon,
@@ -72,6 +74,7 @@ export default function Services() {
                 t("services.gov.f4"),
             ],
             className: "lg:col-span-1 bg-primary text-primary-foreground",
+            href: "/services/government",
         },
         {
             icon: AccountingIcon,
@@ -84,6 +87,7 @@ export default function Services() {
                 t("services.acc.f4"),
             ],
             className: "lg:col-span-1 bg-secondary text-secondary-foreground",
+            href: "/services/accounting",
         },
         {
             title: t("services.legal.title"),
@@ -96,6 +100,7 @@ export default function Services() {
                 t("services.legal.f4"),
             ],
             className: "lg:col-span-2 bg-card",
+            href: "/services/legal",
         },
     ];
 
@@ -129,19 +134,19 @@ export default function Services() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {services.map((service, index) => (
+                        <Link href={service.href} key={index}>
                         <motion.div
-                            key={index}
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
                             className={`${service.className}
-                                group relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border transition-all duration-500
+                                group relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border transition-all duration-500 cursor-pointer h-full
                                 ${service.className.includes('bg-secondary')
-                                    ? 'bg-secondary text-secondary-foreground border-secondary shadow-2xl'
+                                    ? 'bg-secondary text-secondary-foreground border-secondary shadow-2xl hover:scale-[1.02]'
                                     : service.className.includes('bg-primary')
-                                        ? 'bg-primary text-primary-foreground border-primary shadow-xl'
-                                        : 'bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/5'
+                                        ? 'bg-primary text-primary-foreground border-primary shadow-xl hover:scale-[1.02]'
+                                        : 'bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/5 hover:scale-[1.02]'
                                 }`}
                         >
                             {/* Gradient Overlay for Hover */}
@@ -202,6 +207,7 @@ export default function Services() {
                                 </ul>
                             </div>
                         </motion.div>
+                        </Link>
                     ))}
                 </div>
             </div>
