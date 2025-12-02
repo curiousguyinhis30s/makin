@@ -4,8 +4,6 @@ import { motion } from "framer-motion";
 import { Target, Eye, Users, Award, Globe, Shield, Rocket, Heart, CheckCircle2, Building2, Briefcase, GraduationCap, Linkedin, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import Navbar from "@/components/organisms/Navbar";
-import Footer from "@/components/organisms/Footer";
 
 const values = [
     {
@@ -87,9 +85,7 @@ const milestones = [
 
 export default function AboutPage() {
     return (
-        <>
-            <Navbar />
-            <main className="min-h-screen bg-background">
+        <div className="pt-16">
                 {/* Hero Section - Cinematic Style */}
                 <section className="pt-32 pb-24 relative overflow-hidden">
                     {/* Gradient Background */}
@@ -226,8 +222,9 @@ export default function AboutPage() {
                 </section>
 
                 {/* Mission & Vision - Split Design */}
-                <section className="py-24 bg-secondary/30 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(var(--primary-rgb),0.08),transparent_50%)]" />
+                <section className="py-24 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5" />
+                    <div className="absolute top-1/2 left-0 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[120px] -translate-y-1/2" />
 
                     <div className="max-w-7xl mx-auto px-6 lg:px-8 relative">
                         <div className="grid md:grid-cols-2 gap-8">
@@ -318,8 +315,10 @@ export default function AboutPage() {
                 </section>
 
                 {/* Team Section - Premium Cards with Photos */}
-                <section className="py-24 bg-secondary/30">
-                    <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                <section className="py-24 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[150px]" />
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -437,8 +436,6 @@ export default function AboutPage() {
                         </motion.div>
                     </div>
                 </section>
-            </main>
-            <Footer />
-        </>
+            </div>
     );
 }
