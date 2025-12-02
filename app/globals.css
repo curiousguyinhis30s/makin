@@ -1,26 +1,187 @@
 @import "tailwindcss";
 
 :root {
+  /* Nano Theme with Positivus Colors */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #191A23;
+
+  --card: rgba(255, 255, 255, 0.8);
+  --card-foreground: #191A23;
+
+  --popover: #ffffff;
+  --popover-foreground: #191A23;
+
+  --primary: #B9FF66;
+  /* Lime Green */
+  --primary-foreground: #000000;
+
+  --secondary: #191A23;
+  /* Black */
+  --secondary-foreground: #ffffff;
+
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+
+  --accent: #B9FF66;
+  --accent-foreground: #000000;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #B9FF66;
+
+  /* Nano Gradients with Lime */
+  --gradient-nano: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #B9FF66 100%);
+  --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
+  --gradient-border: linear-gradient(90deg, #B9FF66, #191A23);
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+
+    --card: rgba(23, 23, 23, 0.8);
+    --card-foreground: #ededed;
+
+    --popover: #171717;
+    --popover-foreground: #ededed;
+
+    --primary: #B9FF66;
+    /* Lime Green */
+    --primary-foreground: #000000;
+
+    --secondary: #262626;
+    --secondary-foreground: #ededed;
+
+    --muted: #262626;
+    --muted-foreground: #a3a3a3;
+
+    --accent: #B9FF66;
+    --accent-foreground: #000000;
+
+    --destructive: #7f1d1d;
+    --destructive-foreground: #fecaca;
+
+    --border: #262626;
+    --input: #262626;
+    --ring: #B9FF66;
+
+    --gradient-nano: linear-gradient(135deg, #191A23 0%, #262626 50%, #B9FF66 100%);
+    --gradient-glass: linear-gradient(180deg, rgba(23, 23, 23, 0.7) 0%, rgba(23, 23, 23, 0.3) 100%);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Nano Utilities */
+.glass-panel {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+.nano-gradient-text {
+  background: var(--gradient-border);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nano-border-gradient {
+  position: relative;
+  background: var(--card);
+  background-clip: padding-box;
+  border: 1px solid transparent;
+  border-radius: 1rem;
+}
+
+.nano-border-gradient::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  margin: -1px;
+  border-radius: inherit;
+  background: var(--gradient-border);
+}
+
+.btn-primary {
+  background-color: var(--secondary);
+  /* Black */
+  color: var(--secondary-foreground);
+  /* White */
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary);
+  /* Lime */
+  color: var(--primary-foreground);
+  /* Black */
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(185, 255, 102, 0.4);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
 }

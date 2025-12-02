@@ -1,0 +1,356 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// Auth & User Models
+// ==========================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String    @default("CUSTOMER") // Legacy field - use UserRole for RBAC
+  phone         String?
+  company       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Auth relations
+  accounts      Account[]
+  sessions      Session[]
+
+  // Business relations
+  subscriptions    Subscription[]
+  serviceRequests  ServiceRequest[]
+  comments         Comment[]
+
+  // RBAC relations
+  userRoles        UserRole[]
+
+  // Audit & Notification relations
+  auditLogs        AuditLog[]
+  notifications    Notification[]
+
+  // AI relations
+  chatSessions       ChatSession[]
+  generatedDocuments GeneratedDocument[]
+
+  // Payment relations
+  invoices         Invoice[]
+
+  // Staff assignments
+  assignedRequests ServiceRequest[] @relation("AssignedStaff")
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ==========================================
+// RBAC Models
+// ==========================================
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique  // SUPER_ADMIN, ADMIN, STAFF, CUSTOMER
+  displayName String
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  permissions RolePermission[]
+  users       UserRole[]
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  code        String   @unique  // e.g., services.create, users.delete
+  category    String            // e.g., services, users, requests
+  displayName String
+  description String?
+  createdAt   DateTime @default(now())
+
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  assignedAt DateTime @default(now())
+  assignedBy String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+}
+
+// ==========================================
+// Audit & Notification Models
+// ==========================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, etc.
+  entityType String   // User, Service, Request, etc.
+  entityId   String?
+  oldValue   String?  // JSON string of old values
+  newValue   String?  // JSON string of new values
+  ipAddress  String?
+  userAgent  String?
+  metadata   String?  // Additional JSON metadata
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // REQUEST_UPDATE, PAYMENT, SYSTEM, AI_COMPLETE, etc.
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ==========================================
+// AI Models
+// ==========================================
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  userId    String?
+  title     String?
+  context   String?       // Service context for AI
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  messages  ChatMessage[]
+  user      User?         @relation(fields: [userId], references: [id])
+}
+
+model ChatMessage {
+  id            String      @id @default(cuid())
+  chatSessionId String
+  role          String      // user, assistant, system
+  content       String
+  metadata      String?     // JSON for tokens, model info, etc.
+  createdAt     DateTime    @default(now())
+
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+}
+
+model GeneratedDocument {
+  id           String   @id @default(cuid())
+  userId       String
+  type         String   // RESUME, CONTRACT, LETTER, CERTIFICATE, etc.
+  title        String
+  content      String
+  language     String   @default("en") // en, ar
+  templateUsed String?
+  metadata     String?  // JSON for generation params
+  status       String   @default("COMPLETED") // PENDING, COMPLETED, FAILED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+// ==========================================
+// CMS & Business Models
+// ==========================================
+
+model Service {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String   // JSON string for i18n {en: "...", ar: "..."}
+  description String   // JSON string for i18n
+  price       Decimal
+  features    String   // JSON string array
+  icon        String?  // Icon name or URL
+  category    String?  // HR, Government, Accounting, Legal, Specialized
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subscriptions Subscription[]
+  requests      ServiceRequest[]
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String
+  serviceId String
+  status    String   @default("ACTIVE") // ACTIVE, CANCELLED, PENDING, EXPIRED
+  startDate DateTime @default(now())
+  endDate   DateTime?
+  autoRenew Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id])
+  service   Service   @relation(fields: [serviceId], references: [id])
+  invoices  Invoice[]
+}
+
+model SiteConfig {
+  key       String   @id
+  value     String   // JSON value
+  type      String   @default("TEXT") // TEXT, IMAGE, JSON, HTML
+  category  String?  // general, appearance, features, etc.
+  updatedAt DateTime @updatedAt
+}
+
+// ==========================================
+// Portal Models
+// ==========================================
+
+model ServiceRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  serviceId   String?
+  type        String   // HR, Government, Accounting, Legal, Specialized
+  subType     String?  // Specific service within type (e.g., "Visa Processing")
+  title       String
+  description String
+  status      String   @default("PENDING") // PENDING, IN_PROGRESS, UNDER_REVIEW, COMPLETED, REJECTED, CANCELLED
+  priority    String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  assignedTo  String?
+  formData    String?  // JSON for dynamic form data
+  checklist   String?  // JSON for document checklist status
+  dueDate     DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User       @relation(fields: [userId], references: [id])
+  service     Service?   @relation(fields: [serviceId], references: [id])
+  assignee    User?      @relation("AssignedStaff", fields: [assignedTo], references: [id])
+  documents   Document[]
+  comments    Comment[]
+}
+
+model Document {
+  id               String   @id @default(cuid())
+  serviceRequestId String
+  name             String
+  url              String
+  type             String   // USER_UPLOAD, OFFICIAL_DOC, GENERATED
+  mimeType         String?
+  size             Int?
+  createdAt        DateTime @default(now())
+
+  serviceRequest ServiceRequest @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id               String   @id @default(cuid())
+  serviceRequestId String
+  userId           String
+  content          String
+  isInternal       Boolean  @default(false) // Staff-only comments
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  serviceRequest ServiceRequest @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id])
+}
+
+// ==========================================
+// Payment Models
+// ==========================================
+
+model Invoice {
+  id             String        @id @default(cuid())
+  invoiceNumber  String        @unique
+  userId         String
+  subscriptionId String?
+  amount         Decimal
+  tax            Decimal       @default(0)
+  total          Decimal
+  currency       String        @default("SAR")
+  status         String        @default("PENDING") // PENDING, PAID, FAILED, CANCELLED, REFUNDED
+  paymentMethod  String?       // CARD, BANK, CASH
+  paymentRef     String?       // External payment reference
+  paidAt         DateTime?
+  dueDate        DateTime?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  user           User          @relation(fields: [userId], references: [id])
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  items          InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Int     @default(1)
+  unitPrice   Decimal
+  total       Decimal
+
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
