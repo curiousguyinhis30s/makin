@@ -42,17 +42,20 @@ export default function Navbar() {
             }}
             animate={hidden ? "hidden" : "visible"}
             transition={{ duration: 0.35, ease: "easeInOut" }}
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300
                 ${isScrolled
-                    ? "md:top-4 md:w-fit md:mx-auto md:rounded-full md:border md:border-border/40 md:bg-background/80 md:backdrop-blur-md md:shadow-lg bg-background/95 backdrop-blur-md border-b border-border md:px-8"
-                    : "bg-transparent md:top-4 md:w-fit md:mx-auto md:px-8"
+                    ? "md:top-4 md:w-fit md:mx-auto md:rounded-full md:border md:border-border/40 md:bg-background/90 md:backdrop-blur-xl md:shadow-lg bg-background/95 backdrop-blur-md border-b border-border md:px-8"
+                    : "md:top-4 md:w-fit md:mx-auto md:px-8 bg-background/60 backdrop-blur-md md:rounded-full md:border md:border-white/10"
                 }`}
         >
             <div className="max-w-7xl mx-auto px-6 lg:px-0">
                 <div className="flex items-center justify-between h-14 md:h-16 gap-12">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <span className="text-2xl font-bold text-foreground tracking-tight font-display">Makin</span>
+                    <Link href="/" className="flex items-center gap-2.5 group">
+                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shadow-sm shadow-primary/30 group-hover:shadow-primary/50 transition-shadow">
+                            <span className="text-lg font-bold text-primary-foreground">M</span>
+                        </div>
+                        <span className="text-xl font-bold text-foreground tracking-tight">Makin</span>
                     </Link>
 
                     {/* Desktop Navigation */}
