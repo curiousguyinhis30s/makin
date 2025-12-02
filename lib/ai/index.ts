@@ -1,9 +1,29 @@
 import OpenAI from "openai";
 
-// Initialize OpenAI client
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialize OpenAI client (only when needed)
+let _openai: OpenAI | null = null;
+
+export function getOpenAI(): OpenAI {
+  if (!_openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY environment variable is not set");
+    }
+    _openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
+  return _openai;
+}
+
+// For backward compatibility - will throw if API key not set
+export const openai = {
+  get chat() {
+    return getOpenAI().chat;
+  },
+  get completions() {
+    return getOpenAI().completions;
+  },
+};
 
 // Service context for chatbot
 export const SERVICE_CONTEXT = `You are an AI assistant for Makin Business Services, a company in Saudi Arabia that provides:

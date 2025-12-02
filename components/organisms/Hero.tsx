@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate, type Variants } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import Link from "next/link";
@@ -48,7 +48,7 @@ function FloatingParticle({ delay, duration, x, y, size }: { delay: number; dura
 export default function Hero() {
     const { t, direction } = useLanguage();
 
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -59,22 +59,21 @@ export default function Hero() {
         },
     };
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 30 },
         visible: {
             opacity: 1,
             y: 0,
-            transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+            transition: { duration: 0.6 },
         },
     };
 
-    const floatingVariants = {
+    const floatingVariants: Variants = {
         animate: {
             y: [0, -15, 0],
             transition: {
                 duration: 4,
                 repeat: Infinity,
-                ease: "easeInOut",
             },
         },
     };

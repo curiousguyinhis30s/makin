@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, User, Shield } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
-export default function LoginPage() {
+function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -157,5 +157,21 @@ export default function LoginPage() {
                 </p>
             </motion.div>
         </div>
+    );
+}
+
+function LoginFallback() {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+        </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<LoginFallback />}>
+            <LoginForm />
+        </Suspense>
     );
 }

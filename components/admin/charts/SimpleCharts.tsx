@@ -74,7 +74,7 @@ export function SimplePieChart({ data, height = 300 }: ChartProps) {
           outerRadius={100}
           paddingAngle={2}
           dataKey="value"
-          label={({ name, percent }) =>
+          label={({ name, percent = 0 }) =>
             `${name} ${(percent * 100).toFixed(0)}%`
           }
           labelLine={false}

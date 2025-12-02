@@ -192,7 +192,7 @@ export async function checkPermissionWithFallback(
   // Fallback to legacy role check for backwards compatibility
   if (legacyRole) {
     const legacyRolePermissions = ROLE_DEFINITIONS[legacyRole as RoleName]?.permissions || [];
-    return legacyRolePermissions.includes(permission);
+    return (legacyRolePermissions as readonly PermissionCode[]).includes(permission);
   }
 
   return false;

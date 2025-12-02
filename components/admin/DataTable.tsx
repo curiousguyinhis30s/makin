@@ -208,7 +208,11 @@ export function DataTable<T extends Record<string, any>>({
                         key={String(column.key)}
                         className={`px-4 py-3 text-sm ${column.className || ""}`}
                       >
-                        {column.render ? column.render(value, row) : value}
+                        {column.render
+                          ? column.render(value, row)
+                          : (typeof value === 'object' && value !== null
+                              ? JSON.stringify(value)
+                              : String(value ?? ''))}
                       </td>
                     );
                   })}
