@@ -233,7 +233,7 @@ export default function Hero() {
                                 whileTap={{ scale: 0.98 }}
                             >
                                 <Link
-                                    href="/register"
+                                    href="/get-started"
                                     className="btn-primary text-center text-base md:text-lg px-8 py-3 md:px-10 md:py-4 shadow-xl shadow-primary/20 hover:shadow-primary/40 w-full sm:w-auto min-w-[200px] group inline-flex items-center justify-center gap-2 relative overflow-hidden"
                                 >
                                     <span className="relative z-10">{t("hero.cta")}</span>

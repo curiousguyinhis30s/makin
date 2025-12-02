@@ -126,7 +126,7 @@ export default function Navbar() {
                             </div>
                         ) : (
                             <Link
-                                href="/register"
+                                href="/get-started"
                                 className="btn-primary text-sm px-5 py-2.5 shadow-md hover:shadow-primary/20"
                             >
                                 {t("nav.getStarted")}
@@ -208,7 +208,7 @@ export default function Navbar() {
                             </div>
                         ) : (
                             <Link
-                                href="/register"
+                                href="/get-started"
                                 className="block w-full text-center px-4 py-3 mt-4 text-base font-semibold text-primary-foreground bg-primary rounded-lg hover:bg-primary/90"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
