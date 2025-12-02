@@ -36,6 +36,9 @@
   --gradient-nano: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #B9FF66 100%);
   --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
   --gradient-border: linear-gradient(90deg, #B9FF66, #191A23);
+
+  /* Grid */
+  --grid-color: rgba(0, 0, 0, 0.08);
 }
 
 /* Dark Mode - Class-based for ThemeProvider compatibility */
@@ -70,6 +73,9 @@
 
   --gradient-nano: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, rgba(185, 255, 102, 0.1) 100%);
   --gradient-glass: linear-gradient(180deg, rgba(23, 23, 23, 0.8) 0%, rgba(23, 23, 23, 0.4) 100%);
+
+  /* Grid */
+  --grid-color: rgba(255, 255, 255, 0.06);
 }
 
 @theme inline {

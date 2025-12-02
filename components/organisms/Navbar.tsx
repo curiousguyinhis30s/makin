@@ -75,16 +75,16 @@ export default function Navbar() {
                     </div>
 
                     {/* Desktop Actions */}
-                    <div className="hidden md:flex items-center gap-4">
+                    <div className="hidden md:flex items-center gap-2">
                         <button
                             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                            className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                            className="p-2.5 rounded-xl border border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-200"
                             aria-label="Toggle theme"
                         >
                             {theme === "dark" ? (
-                                <Sun className="w-5 h-5 text-foreground" />
+                                <Sun className="w-4 h-4 text-foreground" />
                             ) : (
-                                <Moon className="w-5 h-5 text-foreground" />
+                                <Moon className="w-4 h-4 text-foreground" />
                             )}
                         </button>
                         <LanguageSwitcher />
@@ -135,16 +135,16 @@ export default function Navbar() {
                                 {link.name}
                             </Link>
                         ))}
-                        <div className="px-3 py-2 flex items-center gap-3">
+                        <div className="px-3 py-2 flex items-center gap-2">
                             <button
                                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                                className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                                className="p-2.5 rounded-xl border border-border/50 hover:border-primary hover:bg-primary/10 transition-all duration-200"
                                 aria-label="Toggle theme"
                             >
                                 {theme === "dark" ? (
-                                    <Sun className="w-5 h-5 text-foreground" />
+                                    <Sun className="w-4 h-4 text-foreground" />
                                 ) : (
-                                    <Moon className="w-5 h-5 text-foreground" />
+                                    <Moon className="w-4 h-4 text-foreground" />
                                 )}
                             </button>
                             <LanguageSwitcher />
