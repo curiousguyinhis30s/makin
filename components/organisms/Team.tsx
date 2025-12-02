@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User, Linkedin, Twitter } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
 export default function Team() {
@@ -9,24 +8,28 @@ export default function Team() {
 
     const team = [
         {
-            name: "James Anderson",
-            role: "CEO & Founder",
-            image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&q=80",
+            name: "Mohammed Al-Rashid",
+            role: "Founder & CEO",
+            image: null, // Using initials avatar
+            bio: "15+ years in business consulting across the GCC region."
         },
         {
-            name: "Sarah Mitchell",
+            name: "Sarah Ahmed",
             role: "Head of Operations",
-            image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&q=80",
+            image: null,
+            bio: "Expert in streamlining business processes and compliance."
         },
         {
-            name: "Michael Chen",
-            role: "Legal Consultant",
-            image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&q=80",
+            name: "Khalid Hassan",
+            role: "Government Relations Director",
+            image: null,
+            bio: "Former government official with extensive regulatory expertise."
         },
         {
-            name: "Emma Wilson",
-            role: "Client Relations",
-            image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&q=80",
+            name: "Fatima Al-Salem",
+            role: "HR & Recruitment Lead",
+            image: null,
+            bio: "Specializes in talent acquisition and workforce management."
         },
     ];
 
@@ -52,27 +55,8 @@ export default function Team() {
                             transition={{ delay: index * 0.1 }}
                             className="group text-center"
                         >
-                            <div className="relative overflow-hidden rounded-full bg-secondary/30 aspect-square w-32 h-32 mx-auto mb-4 border-2 border-transparent group-hover:border-primary transition-colors">
-                                {member.image ? (
-                                    <img
-                                        src={member.image}
-                                        alt={member.name}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                ) : (
-                                    <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/20 group-hover:text-primary/20 transition-colors">
-                                        <User className="w-12 h-12" />
-                                    </div>
-                                )}
-                                {/* Overlay with socials */}
-                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
-                                    <a href="#" className="p-1.5 bg-white/10 rounded-full text-white hover:bg-primary hover:text-black transition-colors">
-                                        <Linkedin className="w-4 h-4" />
-                                    </a>
-                                    <a href="#" className="p-1.5 bg-white/10 rounded-full text-white hover:bg-primary hover:text-black transition-colors">
-                                        <Twitter className="w-4 h-4" />
-                                    </a>
-                                </div>
+                            <div className="w-28 h-28 md:w-32 md:h-32 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center text-3xl md:text-4xl font-bold text-primary group-hover:scale-105 transition-transform">
+                                {member.name.split(' ').map(n => n[0]).join('')}
                             </div>
                             <h3 className="text-base md:text-lg font-bold text-foreground">{member.name}</h3>
                             <p className="text-xs md:text-sm text-primary font-medium">{member.role}</p>
