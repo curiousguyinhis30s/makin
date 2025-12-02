@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/lib/i18n";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SessionProvider } from "@/components/SessionProvider";
 import { DemoProvider } from "@/lib/demo-context";
+import { ToastProvider } from "@/components/ui/toast";
 import Chatbot from "@/components/organisms/Chatbot";
 
 const geistSans = Geist({
@@ -73,12 +74,14 @@ export default function RootLayout({
           <SessionProvider>
             <DemoProvider>
               <LanguageProvider>
-                <Navbar />
-                <main className="min-h-screen">
-                  {children}
-                </main>
-                <Footer />
-                <Chatbot />
+                <ToastProvider>
+                  <Navbar />
+                  <main className="min-h-screen">
+                    {children}
+                  </main>
+                  <Footer />
+                  <Chatbot />
+                </ToastProvider>
               </LanguageProvider>
             </DemoProvider>
           </SessionProvider>

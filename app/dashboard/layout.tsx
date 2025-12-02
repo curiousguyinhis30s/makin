@@ -1,4 +1,5 @@
 import Sidebar from "@/components/organisms/Sidebar";
+import { CommandPalette } from "@/components/portal/CommandPalette";
 
 export default function DashboardLayout({
     children,
@@ -11,6 +12,7 @@ export default function DashboardLayout({
             <main className="flex-1 overflow-y-auto pt-[60px] md:pt-0">
                 {children}
             </main>
+            <CommandPalette />
         </div>
     );
 }
