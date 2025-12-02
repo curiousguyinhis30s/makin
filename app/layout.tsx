@@ -19,6 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXTAUTH_URL || "https://makin.vercel.app"),
   title: {
     default: "Makin | Premier Business Solutions in Saudi Arabia",
     template: "%s | Makin",
@@ -30,13 +31,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://bsksa.com",
+    url: "https://makin.vercel.app",
     title: "Makin | Empowering Business Growth in Saudi Arabia",
     description: "Expert HR, Government Relations, and Financial services tailored for the Saudi market. Simplify your operations with Makin.",
     siteName: "Makin",
     images: [
       {
-        url: "/hero-social.png", // We should generate this or use a placeholder
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: "Makin - Business Solutions in Saudi Arabia",
@@ -47,12 +48,13 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Makin | Business Solutions Saudi Arabia",
     description: "Your trusted partner for HR, GRO, and Accounting in KSA.",
-    images: ["/hero-social.png"],
+    images: ["/og-image.svg"],
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/favicon.svg",
   },
 };
 

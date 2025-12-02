@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0A0A0A"/>
+  <rect x="50" y="50" width="80" height="80" rx="16" fill="#B9FF66"/>
+  <text x="90" y="105" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="bold" fill="#0A0A0A" text-anchor="middle">M</text>
+  <text x="150" y="105" font-family="system-ui, -apple-system, sans-serif" font-size="40" font-weight="bold" fill="#FAFAFA">Makin</text>
+  <text x="600" y="300" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="bold" fill="#FAFAFA" text-anchor="middle">Premier Business Solutions</text>
+  <text x="600" y="370" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="bold" fill="#B9FF66" text-anchor="middle">in Saudi Arabia</text>
+  <text x="600" y="450" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#888888" text-anchor="middle">HR • Government Relations • Accounting • Legal</text>
+</svg>
