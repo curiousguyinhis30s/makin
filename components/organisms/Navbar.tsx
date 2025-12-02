@@ -5,7 +5,8 @@ import { Menu, X, Sun, Moon, Sparkles, LogOut } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import LanguageSwitcher from "@/components/molecules/LanguageSwitcher";
@@ -16,7 +17,7 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [hidden, setHidden] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { data: session } = useSession();
+    const { data: session } = useSafeSession();
     const { scrollY } = useScroll();
     const { theme, setTheme } = useTheme();
     const { isDemoMode, demoUser, disableDemoMode } = useDemo();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import {
   CreditCard,
   Receipt,
@@ -36,7 +36,7 @@ interface PaymentMethod {
 }
 
 export default function BillingPage() {
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [isLoading, setIsLoading] = useState(true);

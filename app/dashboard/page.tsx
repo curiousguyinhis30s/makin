@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CreditCard, User, Calendar, Shield, Plus, X, FileText, Clock, CheckCircle2, AlertCircle, Sparkles, Scale } from "lucide-react";
@@ -19,7 +19,7 @@ interface ServiceRequest {
 }
 
 export default function CustomerDashboard() {
-    const { data: session, status } = useSession();
+    const { data: session, status } = useSafeSession();
     const router = useRouter();
     const { t } = useLanguage();
     const { isDemoMode, demoUser, demoRequests, addDemoRequest, isInitialized } = useDemo();

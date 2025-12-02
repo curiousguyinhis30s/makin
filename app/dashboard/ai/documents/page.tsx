@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import {
   Bot,
   FileText,
@@ -37,7 +37,7 @@ interface CompanyInfo {
 }
 
 export default function AIDocumentsPage() {
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(
     null

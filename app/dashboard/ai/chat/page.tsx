@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import { Send, Bot, User, Loader2, Trash2, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -13,7 +13,7 @@ interface Message {
 }
 
 export default function AIChatPage() {
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);

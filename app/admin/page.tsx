@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Users, FileText, TrendingUp, Settings, Check, X, Search, Clock, AlertCircle, CheckCircle2, Sparkles } from "lucide-react";
@@ -65,7 +65,7 @@ const DEMO_ADMIN_REQUESTS: ServiceRequest[] = [
 ];
 
 export default function AdminDashboard() {
-    const { data: session, status } = useSession();
+    const { data: session, status } = useSafeSession();
     const router = useRouter();
     const { t } = useLanguage();
     const { isDemoMode, demoUser, isInitialized } = useDemo();

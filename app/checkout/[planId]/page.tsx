@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import { motion } from "framer-motion";
 import { ArrowLeft, Check, CreditCard, Loader2, Lock, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import { useDemo } from "@/lib/demo-context";
 
 export default function CheckoutPage({ params }: { params: { planId: string } }) {
     const router = useRouter();
-    const { data: session } = useSession();
+    const { data: session } = useSafeSession();
     const { isDemoMode, demoUser, enableDemoMode } = useDemo();
     const { t } = useLanguage();
     const [loading, setLoading] = useState(false);

@@ -1,13 +1,13 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Clock, FileText, Upload, MessageSquare, CheckCircle2, AlertCircle, Shield, User, CreditCard } from "lucide-react";
 import Link from "next/link";
 
 export default function RequestDetails() {
-    const { data: session, status } = useSession();
+    const { data: session, status } = useSafeSession();
     const router = useRouter();
     const params = useParams();
     const id = params.id as string;

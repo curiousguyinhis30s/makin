@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import { useEffect, useState, useCallback } from "react";
 import { PermissionCode, ROLE_DEFINITIONS, RoleName } from "@/lib/permissions";
 
@@ -12,7 +12,7 @@ interface PermissionsState {
 }
 
 export function usePermissions() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSafeSession();
   const [state, setState] = useState<PermissionsState>({
     permissions: [],
     roles: [],

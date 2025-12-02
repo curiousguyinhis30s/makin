@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Bell, Check, X } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 
 interface Notification {
   id: string;
@@ -15,7 +15,7 @@ interface Notification {
 }
 
 export function NotificationBell() {
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

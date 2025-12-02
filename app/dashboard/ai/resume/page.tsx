@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import {
   FileEdit,
   Sparkles,
@@ -24,7 +24,7 @@ interface ResumeHistory {
 }
 
 export default function AIResumePage() {
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const [resumeText, setResumeText] = useState("");
   const [targetJob, setTargetJob] = useState("");
   const [language, setLanguage] = useState<"en" | "ar">("en");

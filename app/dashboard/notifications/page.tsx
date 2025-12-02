@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSafeSession } from "@/lib/use-auth";
 import {
   Bell,
   Check,
@@ -29,7 +29,7 @@ interface Notification {
 }
 
 export default function NotificationsPage() {
-  const { data: session } = useSession();
+  const { data: session } = useSafeSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "unread">("all");
