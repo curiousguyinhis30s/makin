@@ -1,15 +1,56 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Users, Building2, Calculator, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
+
+// Custom SVG icons for better visual appeal
+const HRIcon = ({ className }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="9" cy="7" r="4" />
+        <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        <path d="M21 21v-2a4 4 0 0 0-3-3.85" />
+    </svg>
+);
+
+const GovIcon = ({ className }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 21h18" />
+        <path d="M5 21V7l7-4 7 4v14" />
+        <path d="M9 21v-4h6v4" />
+        <path d="M9 9h.01" />
+        <path d="M15 9h.01" />
+        <path d="M9 13h.01" />
+        <path d="M15 13h.01" />
+    </svg>
+);
+
+const AccountingIcon = ({ className }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="3" width="20" height="18" rx="2" />
+        <path d="M8 7v10" />
+        <path d="M12 7v10" />
+        <path d="M16 7v10" />
+        <path d="M2 12h20" />
+    </svg>
+);
+
+const LegalIcon = ({ className }: { className?: string }) => (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="5" r="3" />
+        <path d="M6.5 8h11" />
+        <path d="M6 8l-2 12h16L18 8" />
+        <path d="M12 8v12" />
+        <path d="M8.5 14h7" />
+    </svg>
+);
 
 export default function Services() {
     const { t } = useLanguage();
 
     const services = [
         {
-            icon: Users,
+            icon: HRIcon,
             title: t("services.hr.title"),
             description: t("services.hr.desc"),
             features: [
@@ -21,7 +62,7 @@ export default function Services() {
             className: "lg:col-span-2 bg-card",
         },
         {
-            icon: Building2,
+            icon: GovIcon,
             title: t("services.gov.title"),
             description: t("services.gov.desc"),
             features: [
@@ -33,7 +74,7 @@ export default function Services() {
             className: "lg:col-span-1 bg-primary text-primary-foreground",
         },
         {
-            icon: Calculator,
+            icon: AccountingIcon,
             title: t("services.acc.title"),
             description: t("services.acc.desc"),
             features: [
@@ -47,7 +88,7 @@ export default function Services() {
         {
             title: t("services.legal.title"),
             description: t("services.legal.desc"),
-            icon: ShieldCheck,
+            icon: LegalIcon,
             features: [
                 t("services.legal.f1"),
                 t("services.legal.f2"),
@@ -60,14 +101,20 @@ export default function Services() {
 
     return (
         <section id="services" className="py-32 bg-background relative overflow-hidden">
-            {/* Background Texture */}
-            <div className="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply">
-                <img src="/images/services-bg.png" alt="" className="w-full h-full object-cover" />
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-30 pointer-events-none">
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#1a1a1a_1px,transparent_1px),linear-gradient(to_bottom,#1a1a1a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_40%,transparent_100%)]" />
             </div>
 
             <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-                <div className="text-center mb-20">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-foreground/5 border border-foreground/10 text-sm font-medium text-foreground/70 mb-6">
+                <motion.div
+                    className="text-center mb-20"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-foreground mb-6">
                         <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(185,255,102,0.5)]" />
                         Our Expertise
                     </div>
@@ -78,7 +125,7 @@ export default function Services() {
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                         {t("services.subtitle")}
                     </p>
-                </div>
+                </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {services.map((service, index) => (
@@ -88,7 +135,7 @@ export default function Services() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className={`${service.className} 
+                            className={`${service.className}
                                 group relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border transition-all duration-500
                                 ${service.className.includes('bg-secondary')
                                     ? 'bg-secondary text-secondary-foreground border-secondary shadow-2xl'
@@ -104,24 +151,30 @@ export default function Services() {
 
                             <div className="relative z-10 h-full flex flex-col">
                                 <div className="flex items-start justify-between mb-6 md:mb-8">
-                                    <div className={`w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500
+                                    <motion.div
+                                        className={`w-14 h-14 md:w-18 md:h-18 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500
                                         ${service.className.includes('bg-secondary')
                                             ? 'bg-white/10 text-white'
                                             : service.className.includes('bg-primary')
                                                 ? 'bg-black/10 text-black'
                                                 : 'bg-primary/10 text-primary'
-                                        }`}>
-                                        <service.icon className="w-6 h-6 md:w-8 md:h-8" />
-                                    </div>
-                                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0
+                                        }`}
+                                        whileHover={{ rotate: 5 }}
+                                    >
+                                        <service.icon className="w-7 h-7 md:w-9 md:h-9" />
+                                    </motion.div>
+                                    <motion.div
+                                        className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0
                                         ${service.className.includes('bg-secondary')
                                             ? 'bg-white/10 text-white'
                                             : service.className.includes('bg-primary')
                                                 ? 'bg-black/10 text-black'
                                                 : 'bg-primary/10 text-primary'
-                                        }`}>
+                                        }`}
+                                        whileHover={{ scale: 1.1 }}
+                                    >
                                         <span className="transform -rotate-45 text-lg md:text-xl">→</span>
-                                    </div>
+                                    </motion.div>
                                 </div>
 
                                 <h3 className={`text-2xl md:text-3xl font-bold mb-3 md:mb-4 ${service.className.includes('bg-secondary') ? 'text-white' : service.className.includes('bg-primary') ? 'text-black' : 'text-foreground'}`}>
@@ -134,10 +187,17 @@ export default function Services() {
 
                                 <ul className="space-y-3 md:space-y-4 mt-auto">
                                     {service.features?.map((feature, idx) => (
-                                        <li key={idx} className={`flex items-center gap-3 text-sm font-medium ${service.className.includes('bg-secondary') ? 'text-gray-300' : service.className.includes('bg-primary') ? 'text-black/80' : 'text-muted-foreground'}`}>
-                                            <div className={`w-1.5 h-1.5 rounded-full ${service.className.includes('bg-secondary') ? 'bg-primary' : service.className.includes('bg-primary') ? 'bg-black' : 'bg-primary'}`} />
+                                        <motion.li
+                                            key={idx}
+                                            className={`flex items-center gap-3 text-sm font-medium ${service.className.includes('bg-secondary') ? 'text-gray-300' : service.className.includes('bg-primary') ? 'text-black/80' : 'text-muted-foreground'}`}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ delay: 0.1 * idx }}
+                                        >
+                                            <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${service.className.includes('bg-secondary') ? 'bg-primary' : service.className.includes('bg-primary') ? 'bg-black' : 'bg-primary'}`} />
                                             <span>{feature}</span>
-                                        </li>
+                                        </motion.li>
                                     ))}
                                 </ul>
                             </div>
