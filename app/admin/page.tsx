@@ -68,7 +68,7 @@ export default function AdminDashboard() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const { t } = useLanguage();
-    const { isDemoMode, demoUser } = useDemo();
+    const { isDemoMode, demoUser, isInitialized } = useDemo();
 
     const [requests, setRequests] = useState<ServiceRequest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -85,7 +85,8 @@ export default function AdminDashboard() {
     ]);
 
     useEffect(() => {
-        if (status === "loading") return;
+        // Wait for both session and demo context to initialize
+        if (status === "loading" || !isInitialized) return;
 
         if (isDemoMode) {
             // Check if demo user is admin
@@ -115,7 +116,7 @@ export default function AdminDashboard() {
             }
             fetchRequests();
         }
-    }, [status, router, session, isDemoMode, demoUser]);
+    }, [status, router, session, isDemoMode, demoUser, isInitialized]);
 
     const fetchRequests = async () => {
         try {
@@ -163,7 +164,7 @@ export default function AdminDashboard() {
         }
     };
 
-    if (status === "loading" || isLoading) {
+    if (status === "loading" || isLoading || !isInitialized) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="text-center">

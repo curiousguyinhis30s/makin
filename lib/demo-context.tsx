@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 
 interface DemoUser {
     id: string;
@@ -14,7 +14,8 @@ interface DemoUser {
 interface DemoContextType {
     isDemoMode: boolean;
     demoUser: DemoUser | null;
-    enableDemoMode: (role?: "USER" | "ADMIN") => void;
+    isInitialized: boolean;
+    enableDemoMode: (role?: "USER" | "ADMIN") => Promise<void>;
     disableDemoMode: () => void;
     demoRequests: DemoRequest[];
     addDemoRequest: (request: Omit<DemoRequest, "id" | "createdAt">) => void;
@@ -85,33 +86,52 @@ const INITIAL_DEMO_REQUESTS: DemoRequest[] = [
     },
 ];
 
+// Helper to check localStorage (safe for SSR)
+function getInitialDemoState(): { isDemoMode: boolean; role: "USER" | "ADMIN" | null } {
+    if (typeof window === "undefined") {
+        return { isDemoMode: false, role: null };
+    }
+    const savedDemoMode = localStorage.getItem("makin-demo-mode");
+    const savedDemoRole = localStorage.getItem("makin-demo-role") as "USER" | "ADMIN" | null;
+    return {
+        isDemoMode: savedDemoMode === "true",
+        role: savedDemoRole
+    };
+}
+
 export function DemoProvider({ children }: { children: ReactNode }) {
     const [isDemoMode, setIsDemoMode] = useState(false);
     const [demoUser, setDemoUser] = useState<DemoUser | null>(null);
     const [demoRequests, setDemoRequests] = useState<DemoRequest[]>(INITIAL_DEMO_REQUESTS);
+    const [isInitialized, setIsInitialized] = useState(false);
 
+    // Initialize from localStorage on mount
     useEffect(() => {
-        // Check if demo mode was previously enabled
-        const savedDemoMode = localStorage.getItem("makin-demo-mode");
-        const savedDemoRole = localStorage.getItem("makin-demo-role") as "USER" | "ADMIN" | null;
-        if (savedDemoMode === "true") {
-            enableDemoMode(savedDemoRole || "USER");
+        const { isDemoMode: savedMode, role } = getInitialDemoState();
+        if (savedMode && role) {
+            setIsDemoMode(true);
+            setDemoUser(role === "ADMIN" ? DEMO_ADMIN : DEMO_USER);
         }
+        setIsInitialized(true);
     }, []);
 
-    const enableDemoMode = (role: "USER" | "ADMIN" = "USER") => {
-        setIsDemoMode(true);
-        setDemoUser(role === "ADMIN" ? DEMO_ADMIN : DEMO_USER);
-        localStorage.setItem("makin-demo-mode", "true");
-        localStorage.setItem("makin-demo-role", role);
-    };
+    const enableDemoMode = useCallback(async (role: "USER" | "ADMIN" = "USER"): Promise<void> => {
+        return new Promise((resolve) => {
+            setIsDemoMode(true);
+            setDemoUser(role === "ADMIN" ? DEMO_ADMIN : DEMO_USER);
+            localStorage.setItem("makin-demo-mode", "true");
+            localStorage.setItem("makin-demo-role", role);
+            // Small delay to ensure state is committed before navigation
+            setTimeout(resolve, 50);
+        });
+    }, []);
 
-    const disableDemoMode = () => {
+    const disableDemoMode = useCallback(() => {
         setIsDemoMode(false);
         setDemoUser(null);
         localStorage.removeItem("makin-demo-mode");
         localStorage.removeItem("makin-demo-role");
-    };
+    }, []);
 
     const addDemoRequest = (request: Omit<DemoRequest, "id" | "createdAt">) => {
         const newRequest: DemoRequest = {
@@ -133,6 +153,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
             value={{
                 isDemoMode,
                 demoUser,
+                isInitialized,
                 enableDemoMode,
                 disableDemoMode,
                 demoRequests,

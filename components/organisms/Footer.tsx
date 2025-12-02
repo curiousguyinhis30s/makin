@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n";
+import { Linkedin, Instagram, Twitter } from "lucide-react";
 
 export default function Footer() {
     const { t } = useLanguage();
@@ -16,17 +17,34 @@ export default function Footer() {
                         <span className="text-2xl font-bold tracking-tight">Makin</span>
                     </div>
 
-                    <div className="flex gap-6">
-                        {/* Social Icons Placeholder */}
-                        <div className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
-                            <span className="font-bold">in</span>
-                        </div>
-                        <div className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
-                            <span className="font-bold">fb</span>
-                        </div>
-                        <div className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center cursor-pointer hover:bg-primary transition-colors">
-                            <span className="font-bold">tw</span>
-                        </div>
+                    <div className="flex gap-4">
+                        <a
+                            href="https://linkedin.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center cursor-pointer hover:bg-primary hover:border-primary hover:text-black transition-all duration-200"
+                            aria-label="LinkedIn"
+                        >
+                            <Linkedin className="w-5 h-5" />
+                        </a>
+                        <a
+                            href="https://instagram.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center cursor-pointer hover:bg-primary hover:border-primary hover:text-black transition-all duration-200"
+                            aria-label="Instagram"
+                        >
+                            <Instagram className="w-5 h-5" />
+                        </a>
+                        <a
+                            href="https://twitter.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center cursor-pointer hover:bg-primary hover:border-primary hover:text-black transition-all duration-200"
+                            aria-label="Twitter"
+                        >
+                            <Twitter className="w-5 h-5" />
+                        </a>
                     </div>
                 </div>
 

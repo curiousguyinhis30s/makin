@@ -22,7 +22,7 @@ export default function CustomerDashboard() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const { t } = useLanguage();
-    const { isDemoMode, demoUser, demoRequests, addDemoRequest } = useDemo();
+    const { isDemoMode, demoUser, demoRequests, addDemoRequest, isInitialized } = useDemo();
 
     const container = {
         hidden: { opacity: 0 },
@@ -52,7 +52,8 @@ export default function CustomerDashboard() {
     const currentUser = isDemoMode ? demoUser : session?.user;
 
     useEffect(() => {
-        if (status === "loading") return;
+        // Wait for both session and demo context to initialize
+        if (status === "loading" || !isInitialized) return;
 
         if (!isDemoMode && status === "unauthenticated") {
             router.push("/login");
@@ -73,7 +74,7 @@ export default function CustomerDashboard() {
         } else if (status === "authenticated") {
             fetchRequests();
         }
-    }, [status, router, isDemoMode, demoRequests]);
+    }, [status, router, isDemoMode, demoRequests, isInitialized]);
 
     const fetchRequests = async () => {
         try {
@@ -89,7 +90,7 @@ export default function CustomerDashboard() {
         }
     };
 
-    if (status === "loading" || isLoading) {
+    if (status === "loading" || isLoading || !isInitialized) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="text-center">

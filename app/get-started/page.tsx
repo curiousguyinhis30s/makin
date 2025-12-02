@@ -10,13 +10,13 @@ export default function GetStartedPage() {
     const router = useRouter();
     const { enableDemoMode } = useDemo();
 
-    const handleDemoUser = () => {
-        enableDemoMode("USER");
+    const handleDemoUser = async () => {
+        await enableDemoMode("USER");
         router.push("/dashboard");
     };
 
-    const handleDemoAdmin = () => {
-        enableDemoMode("ADMIN");
+    const handleDemoAdmin = async () => {
+        await enableDemoMode("ADMIN");
         router.push("/admin");
     };
 
