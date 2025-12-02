@@ -1,11 +1,12 @@
 "use client";
 
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n";
 import { useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import LanguageSwitcher from "@/components/molecules/LanguageSwitcher";
 
@@ -16,6 +17,7 @@ export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { data: session } = useSession();
     const { scrollY } = useScroll();
+    const { theme, setTheme } = useTheme();
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         const previous = scrollY.getPrevious() || 0;
@@ -74,6 +76,17 @@ export default function Navbar() {
 
                     {/* Desktop Actions */}
                     <div className="hidden md:flex items-center gap-4">
+                        <button
+                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                            className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                            aria-label="Toggle theme"
+                        >
+                            {theme === "dark" ? (
+                                <Sun className="w-5 h-5 text-foreground" />
+                            ) : (
+                                <Moon className="w-5 h-5 text-foreground" />
+                            )}
+                        </button>
                         <LanguageSwitcher />
 
                         {session ? (
@@ -122,7 +135,18 @@ export default function Navbar() {
                                 {link.name}
                             </Link>
                         ))}
-                        <div className="px-3 py-2">
+                        <div className="px-3 py-2 flex items-center gap-3">
+                            <button
+                                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                                className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                                aria-label="Toggle theme"
+                            >
+                                {theme === "dark" ? (
+                                    <Sun className="w-5 h-5 text-foreground" />
+                                ) : (
+                                    <Moon className="w-5 h-5 text-foreground" />
+                                )}
+                            </button>
                             <LanguageSwitcher />
                         </div>
                         {session ? (

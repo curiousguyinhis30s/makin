@@ -66,7 +66,7 @@ export default function Pricing() {
                 </div>
 
                 {/* Mobile: Horizontal Scroll / Desktop: Grid */}
-                <div className="md:hidden flex overflow-x-auto snap-x snap-mandatory pb-8 gap-4 -mx-6 px-6 scrollbar-hide">
+                <div className="md:hidden flex overflow-x-auto snap-x snap-mandatory pb-8 pt-4 gap-4 -mx-6 px-6 scrollbar-hide">
                     {plans.map((plan, index) => (
                         <motion.div
                             key={index}
@@ -118,7 +118,7 @@ export default function Pricing() {
                 </div>
 
                 {/* Desktop Grid View */}
-                <div className="hidden md:grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <div className="hidden md:grid md:grid-cols-3 gap-6 max-w-4xl mx-auto pt-6">
                     {plans.map((plan, index) => (
                         <motion.div
                             key={index}
@@ -151,7 +151,7 @@ export default function Pricing() {
                                     {plan.features.map((feature: string, idx: number) => (
                                         <li key={idx} className="flex items-start gap-3 text-muted-foreground/90 text-sm">
                                             <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                <Check className="w-3 h-3 text-primary-foreground" />
+                                                <Check className="w-3 h-3 text-primary" />
                                             </div>
                                             <span>{feature}</span>
                                         </li>

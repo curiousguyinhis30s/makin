@@ -16,7 +16,7 @@ export default function Team() {
         {
             name: "Sarah Mitchell",
             role: "Head of Operations",
-            image: "https://images.unsplash.com/photo-1573496359-136d47552640?w=400&h=400&fit=crop&q=80",
+            image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&q=80",
         },
         {
             name: "Michael Chen",
