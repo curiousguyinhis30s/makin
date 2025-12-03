@@ -2,8 +2,29 @@
 
 import { useSafeSession } from "@/lib/use-auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { CreditCard, User, Calendar, Shield, Plus, X, FileText, Clock, CheckCircle2, AlertCircle, Sparkles, Scale } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import {
+    CreditCard,
+    User,
+    Shield,
+    Plus,
+    X,
+    FileText,
+    Clock,
+    CheckCircle2,
+    AlertCircle,
+    Sparkles,
+    Scale,
+    TrendingUp,
+    ArrowRight,
+    Calendar,
+    Building2,
+    Zap,
+    MessageSquare,
+    Receipt,
+    ChevronRight,
+    Activity,
+} from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -18,41 +39,51 @@ interface ServiceRequest {
     description: string;
 }
 
+const serviceTypeConfig: Record<string, { icon: typeof Shield; color: string; bgColor: string }> = {
+    Government: { icon: Shield, color: "text-blue-600", bgColor: "bg-blue-500/10" },
+    HR: { icon: User, color: "text-purple-600", bgColor: "bg-purple-500/10" },
+    Legal: { icon: Scale, color: "text-emerald-600", bgColor: "bg-emerald-500/10" },
+    Accounting: { icon: CreditCard, color: "text-orange-600", bgColor: "bg-orange-500/10" },
+};
+
+const quickActions = [
+    { label: "New Request", icon: Plus, href: "#new-request", primary: true },
+    { label: "AI Assistant", icon: MessageSquare, href: "/dashboard/ai/chat" },
+    { label: "View Invoices", icon: Receipt, href: "/dashboard/billing" },
+    { label: "Get Support", icon: Zap, href: "/dashboard/support" },
+];
+
 export default function CustomerDashboard() {
     const { data: session, status } = useSafeSession();
     const router = useRouter();
     const { t } = useLanguage();
     const { isDemoMode, demoUser, demoRequests, addDemoRequest, isInitialized } = useDemo();
 
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
-        }
-    };
-
-    const item = {
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 }
-    };
-
     const [activeServices, setActiveServices] = useState<ServiceRequest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-
-    // Request Modal State
     const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     const [newRequest, setNewRequest] = useState({ type: "HR", title: "", description: "" });
-    const [expandedId, setExpandedId] = useState<string | null>(null);
 
-    // Check if user is authenticated via session or demo mode
     const isAuthenticated = session || isDemoMode;
     const currentUser = isDemoMode ? demoUser : session?.user;
 
+    // Calculate stats from requests
+    const stats = useMemo(() => {
+        const pending = activeServices.filter(s => s.status === "Pending").length;
+        const inProgress = activeServices.filter(s => s.status === "In Progress").length;
+        const completed = activeServices.filter(s => s.status === "Completed").length;
+        return { total: activeServices.length, pending, inProgress, completed };
+    }, [activeServices]);
+
+    // Get time of day greeting
+    const greeting = useMemo(() => {
+        const hour = new Date().getHours();
+        if (hour < 12) return "Good morning";
+        if (hour < 18) return "Good afternoon";
+        return "Good evening";
+    }, []);
+
     useEffect(() => {
-        // Wait for both session and demo context to initialize
         if (status === "loading" || !isInitialized) return;
 
         if (!isDemoMode && status === "unauthenticated") {
@@ -61,7 +92,6 @@ export default function CustomerDashboard() {
         }
 
         if (isDemoMode) {
-            // Use demo requests
             setActiveServices(demoRequests.map(req => ({
                 id: req.id,
                 title: req.title,
@@ -107,7 +137,6 @@ export default function CustomerDashboard() {
         e.preventDefault();
 
         if (isDemoMode) {
-            // Handle demo mode request creation
             const newDemoRequest = {
                 id: `req-demo-${Date.now()}`,
                 title: newRequest.title || `${newRequest.type} Service Request`,
@@ -145,119 +174,186 @@ export default function CustomerDashboard() {
         }
     };
 
+    const handleQuickAction = (action: typeof quickActions[0]) => {
+        if (action.href === "#new-request") {
+            setIsRequestModalOpen(true);
+        }
+    };
+
     return (
         <div className="min-h-screen px-4 sm:px-6 lg:px-8 pb-20 pt-6 sm:pt-8">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-foreground mb-1 tracking-tight">
-                        {t("dashboard.title")}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">Manage your business operations and track service requests.</p>
-                </div>
-                <div className="flex items-center gap-4">
-                    {isDemoMode && (
-                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full">
-                            <Sparkles className="w-3.5 h-3.5 text-primary" />
-                            <span className="text-xs font-medium text-primary">Demo Mode</span>
+            {/* Welcome Banner */}
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 p-6 sm:p-8 mb-8"
+            >
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            {isDemoMode && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary/20 border border-primary/30 rounded-full text-xs font-medium text-primary">
+                                    <Sparkles className="w-3 h-3" />
+                                    Demo Mode
+                                </span>
+                            )}
                         </div>
-                    )}
-                    <div className="hidden md:block text-right">
-                        <p className="text-sm font-medium text-foreground">{currentUser?.name}</p>
-                        <p className="text-xs text-muted-foreground">{currentUser?.email}</p>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1">
+                            {greeting}, {currentUser?.name?.split(" ")[0] || "User"}
+                        </h1>
+                        <p className="text-muted-foreground">
+                            Here's what's happening with your business services today.
+                        </p>
                     </div>
-                    <button
-                        onClick={() => setIsRequestModalOpen(true)}
-                        className="btn-primary flex items-center gap-2"
+                    <div className="flex items-center gap-3">
+                        <div className="text-right hidden sm:block">
+                            <p className="text-sm text-muted-foreground">Today</p>
+                            <p className="text-lg font-semibold text-foreground">
+                                {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
+                            </p>
+                        </div>
+                        <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+                            <Calendar className="w-6 h-6 text-primary" />
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {[
+                    { label: "Total Requests", value: stats.total, icon: FileText, color: "text-foreground", bgColor: "bg-secondary" },
+                    { label: "Pending", value: stats.pending, icon: Clock, color: "text-yellow-600", bgColor: "bg-yellow-500/10" },
+                    { label: "In Progress", value: stats.inProgress, icon: Activity, color: "text-blue-600", bgColor: "bg-blue-500/10" },
+                    { label: "Completed", value: stats.completed, icon: CheckCircle2, color: "text-emerald-600", bgColor: "bg-emerald-500/10" },
+                ].map((stat, index) => (
+                    <motion.div
+                        key={stat.label}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="bg-card border border-border rounded-2xl p-4 sm:p-5"
                     >
-                        <Plus className="w-4 h-4" />
-                        New Request
-                    </button>
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={`p-2.5 rounded-xl ${stat.bgColor}`}>
+                                <stat.icon className={`w-5 h-5 ${stat.color}`} />
+                            </div>
+                        </div>
+                        <p className="text-2xl sm:text-3xl font-bold text-foreground">{stat.value}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">{stat.label}</p>
+                    </motion.div>
+                ))}
+            </div>
+
+            {/* Quick Actions */}
+            <div className="mb-8">
+                <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {quickActions.map((action, index) => (
+                        <motion.button
+                            key={action.label}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.2 + index * 0.05 }}
+                            onClick={() => action.primary ? handleQuickAction(action) : null}
+                            className={`group relative flex flex-col items-center justify-center gap-2 p-4 sm:p-5 rounded-2xl border transition-all ${
+                                action.primary
+                                    ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+                                    : "bg-card border-border hover:border-primary/50 hover:shadow-md"
+                            }`}
+                        >
+                            {action.primary ? (
+                                <>
+                                    <action.icon className="w-6 h-6" />
+                                    <span className="text-sm font-medium">{action.label}</span>
+                                </>
+                            ) : (
+                                <Link href={action.href} className="flex flex-col items-center gap-2 w-full">
+                                    <action.icon className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
+                                    <span className="text-sm font-medium text-foreground">{action.label}</span>
+                                </Link>
+                            )}
+                        </motion.button>
+                    ))}
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Content: Active Services */}
+                {/* Main Content: Recent Requests */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="glass-panel rounded-3xl p-6 shadow-sm">
-                        <h2 className="text-lg font-bold text-foreground flex items-center gap-2 mb-6">
-                            <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                                <FileText className="w-5 h-5" />
-                            </div>
-                            {t("dashboard.activeSubs") || "Active Services"}
-                        </h2>
+                    <div className="bg-card border border-border rounded-2xl overflow-hidden">
+                        <div className="flex items-center justify-between p-5 border-b border-border">
+                            <h2 className="text-lg font-semibold text-foreground">Recent Requests</h2>
+                            <Link
+                                href="/dashboard/requests"
+                                className="text-sm text-primary font-medium hover:underline flex items-center gap-1"
+                            >
+                                View All
+                                <ChevronRight className="w-4 h-4" />
+                            </Link>
+                        </div>
 
                         {activeServices.length === 0 ? (
-                            <div className="text-center py-12 border-2 border-dashed border-border/50 rounded-2xl bg-secondary/20">
-                                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4 text-muted-foreground">
-                                    <FileText className="w-8 h-8" />
+                            <div className="text-center py-12 px-6">
+                                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <FileText className="w-8 h-8 text-muted-foreground/50" />
                                 </div>
-                                <h3 className="text-foreground font-medium mb-1">No active requests</h3>
-                                <p className="text-sm text-muted-foreground mb-4">Get started by creating your first service request.</p>
-                                <button onClick={() => setIsRequestModalOpen(true)} className="text-primary hover:underline text-sm font-medium">Create Request</button>
+                                <h3 className="text-foreground font-medium mb-1">No requests yet</h3>
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    Get started by creating your first service request.
+                                </p>
+                                <button
+                                    onClick={() => setIsRequestModalOpen(true)}
+                                    className="btn-primary inline-flex items-center gap-2"
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    Create Request
+                                </button>
                             </div>
                         ) : (
-                            <motion.div
-                                variants={container}
-                                initial="hidden"
-                                animate="show"
-                                className="space-y-4"
-                            >
-                                {activeServices.map((service) => (
-                                    <motion.div
-                                        layout
-                                        variants={item}
-                                        key={service.id}
-                                        className="group relative bg-background/50 border border-border rounded-2xl p-5 hover:border-primary/50 transition-all duration-300 hover:shadow-md overflow-hidden"
-                                    >
-                                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="divide-y divide-border">
+                                {activeServices.slice(0, 5).map((service, index) => {
+                                    const typeConfig = serviceTypeConfig[service.type] || serviceTypeConfig.HR;
+                                    const Icon = typeConfig.icon;
 
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                            <div className="flex items-start gap-4">
-                                                <div className={`p-3 rounded-xl shrink-0 ${service.type === 'Government' ? 'bg-blue-500/10 text-blue-600' :
-                                                    service.type === 'HR' ? 'bg-purple-500/10 text-purple-600' :
-                                                    service.type === 'Legal' ? 'bg-green-500/10 text-green-600' :
-                                                        'bg-orange-500/10 text-orange-600'
-                                                    }`}>
-                                                    {service.type === 'Government' ? <Shield className="w-5 h-5" /> :
-                                                        service.type === 'HR' ? <User className="w-5 h-5" /> :
-                                                        service.type === 'Legal' ? <Scale className="w-5 h-5" /> :
-                                                            <CreditCard className="w-5 h-5" />}
+                                    return (
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: index * 0.05 }}
+                                            key={service.id}
+                                            className="group p-4 hover:bg-secondary/30 transition-colors"
+                                        >
+                                            <Link href={`/dashboard/requests/${service.id}`} className="flex items-center gap-4">
+                                                <div className={`p-2.5 rounded-xl ${typeConfig.bgColor} shrink-0`}>
+                                                    <Icon className={`w-5 h-5 ${typeConfig.color}`} />
                                                 </div>
-                                                <div>
-                                                    <Link href={`/dashboard/requests/${service.id}`} className="hover:text-primary transition-colors">
-                                                        <h3 className="text-base font-bold text-foreground">{service.title}</h3>
-                                                    </Link>
-                                                    <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
-                                                        <span className="flex items-center gap-1 bg-secondary/50 px-2 py-0.5 rounded-md">
-                                                            <Clock className="w-3 h-3" /> {new Date(service.createdAt).toLocaleDateString()}
-                                                        </span>
-                                                        <span>#{service.id.slice(-4)}</span>
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-medium text-foreground truncate group-hover:text-primary transition-colors">
+                                                        {service.title}
+                                                    </h3>
+                                                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                                                        <span>{service.type}</span>
+                                                        <span>•</span>
+                                                        <span>{new Date(service.createdAt).toLocaleDateString()}</span>
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${service.status === "Completed" ? "bg-green-500/10 text-green-600 border border-green-500/20" :
-                                                    service.status === "In Progress" ? "bg-blue-500/10 text-blue-600 border border-blue-500/20" :
-                                                        "bg-yellow-500/10 text-yellow-600 border border-yellow-500/20"
-                                                    }`}>
-                                                    {service.status === "Completed" ? <CheckCircle2 className="w-3 h-3" /> :
-                                                        service.status === "In Progress" ? <Clock className="w-3 h-3" /> :
-                                                            <AlertCircle className="w-3 h-3" />}
+                                                <span className={`px-2.5 py-1 rounded-full text-xs font-medium shrink-0 ${
+                                                    service.status === "Completed"
+                                                        ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
+                                                        : service.status === "In Progress"
+                                                        ? "bg-blue-500/10 text-blue-600 border border-blue-500/20"
+                                                        : "bg-yellow-500/10 text-yellow-600 border border-yellow-500/20"
+                                                }`}>
                                                     {service.status}
                                                 </span>
-                                                <Link
-                                                    href={`/dashboard/requests/${service.id}`}
-                                                    className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                                                >
-                                                    <FileText className="w-4 h-4" />
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </motion.div>
+                                                <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            </Link>
+                                        </motion.div>
+                                    );
+                                })}
+                            </div>
                         )}
                     </div>
                 </div>
@@ -265,51 +361,68 @@ export default function CustomerDashboard() {
                 {/* Sidebar */}
                 <div className="space-y-6">
                     {/* Profile Card */}
-                    <div className="nano-border-gradient p-[1px] rounded-[2rem]">
-                        <div className="bg-card rounded-[2rem] p-6 h-full">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-purple-600 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/20">
-                                    {currentUser?.name?.[0] || "U"}
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-foreground text-base">{currentUser?.name}</h3>
-                                    <p className="text-xs text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full inline-block mt-1">
-                                        {isDemoMode ? demoUser?.plan : "Premium Member"}
-                                    </p>
-                                </div>
+                    <div className="bg-card border border-border rounded-2xl p-5">
+                        <div className="flex items-center gap-4 mb-5">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-purple-600 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/20">
+                                {currentUser?.name?.[0] || "U"}
                             </div>
-
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center text-sm p-4 bg-background/50 border border-border rounded-xl hover:border-primary/30 transition-colors">
-                                    <span className="text-muted-foreground">{t("dashboard.memberSince")}</span>
-                                    <span className="font-medium text-foreground">
-                                        {isDemoMode && demoUser?.memberSince
-                                            ? new Date(demoUser.memberSince).toLocaleDateString()
-                                            : new Date().toLocaleDateString()}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between items-center text-sm p-4 bg-background/50 border border-border rounded-xl hover:border-primary/30 transition-colors">
-                                    <span className="text-muted-foreground">{t("dashboard.activeServices")}</span>
-                                    <span className="font-medium text-foreground">{activeServices.length}</span>
-                                </div>
+                            <div>
+                                <h3 className="font-bold text-foreground">{currentUser?.name}</h3>
+                                <p className="text-sm text-muted-foreground">{currentUser?.email}</p>
                             </div>
                         </div>
+
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center text-sm p-3 bg-secondary/50 rounded-xl">
+                                <span className="text-muted-foreground flex items-center gap-2">
+                                    <Building2 className="w-4 h-4" />
+                                    Plan
+                                </span>
+                                <span className="font-medium text-primary">
+                                    {isDemoMode ? demoUser?.plan : "Professional"}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm p-3 bg-secondary/50 rounded-xl">
+                                <span className="text-muted-foreground flex items-center gap-2">
+                                    <Calendar className="w-4 h-4" />
+                                    Member Since
+                                </span>
+                                <span className="font-medium text-foreground">
+                                    {isDemoMode && demoUser?.memberSince
+                                        ? new Date(demoUser.memberSince).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+                                        : new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                                </span>
+                            </div>
+                        </div>
+
+                        <Link
+                            href="/dashboard/profile"
+                            className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-xl transition-colors"
+                        >
+                            View Profile
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
                     </div>
 
-                    {/* Support Card */}
-                    <div className="glass-panel rounded-3xl p-6 relative overflow-hidden">
-                        <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
-
-                        <h2 className="text-lg font-bold text-foreground flex items-center gap-2 mb-3 relative z-10">
-                            <Shield className="w-5 h-5 text-primary" />
-                            {t("dashboard.needHelp")}
-                        </h2>
-                        <p className="text-sm text-muted-foreground mb-6 leading-relaxed relative z-10">
-                            {t("dashboard.supportDesc")}
-                        </p>
-                        <button className="w-full btn-outline relative z-10 bg-background/50 hover:bg-background">
-                            {t("dashboard.contactSupport")}
-                        </button>
+                    {/* Need Help Card */}
+                    <div className="relative overflow-hidden bg-gradient-to-br from-secondary to-secondary/50 border border-border rounded-2xl p-5">
+                        <div className="absolute -top-8 -right-8 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
+                        <div className="relative z-10">
+                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                                <Zap className="w-5 h-5 text-primary" />
+                            </div>
+                            <h3 className="font-semibold text-foreground mb-2">Need Assistance?</h3>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                Our team is ready to help with your business needs.
+                            </p>
+                            <Link
+                                href="/dashboard/support"
+                                className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                            >
+                                Contact Support
+                                <ArrowRight className="w-4 h-4" />
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -329,76 +442,88 @@ export default function CustomerDashboard() {
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg glass-panel rounded-3xl shadow-2xl z-50 p-8"
+                            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl z-50 p-6 sm:p-8 mx-4"
                         >
-                            <div className="flex justify-between items-center mb-6">
+                            <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h2 className="text-2xl font-bold text-foreground">New Service Request</h2>
-                                    <p className="text-sm text-muted-foreground">Submit a new request for your business.</p>
+                                    <h2 className="text-xl font-bold text-foreground">New Service Request</h2>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                        Submit a new request and we'll get back to you shortly.
+                                    </p>
                                 </div>
                                 <button
                                     onClick={() => setIsRequestModalOpen(false)}
-                                    className="p-2 hover:bg-secondary rounded-full transition-colors"
+                                    className="p-2 hover:bg-secondary rounded-lg transition-colors"
                                 >
                                     <X className="w-5 h-5 text-muted-foreground" />
                                 </button>
                             </div>
 
-                            <form onSubmit={handleSubmitRequest} className="space-y-6">
+                            <form onSubmit={handleSubmitRequest} className="space-y-5">
                                 <div>
-                                    <label className="block text-sm font-medium text-foreground mb-2">Service Type</label>
-                                    <div className="relative">
-                                        <select
-                                            value={newRequest.type}
-                                            onChange={(e) => setNewRequest({ ...newRequest, type: e.target.value })}
-                                            className="w-full bg-background/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm appearance-none"
-                                        >
-                                            <option value="HR">HR & Recruitment</option>
-                                            <option value="Government">Government Relations (GRO)</option>
-                                            <option value="Accounting">Accounting & Finance</option>
-                                            <option value="Legal">Legal Consultation</option>
-                                        </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                        </div>
+                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                        Service Type
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {Object.entries(serviceTypeConfig).map(([type, config]) => {
+                                            const Icon = config.icon;
+                                            return (
+                                                <button
+                                                    key={type}
+                                                    type="button"
+                                                    onClick={() => setNewRequest({ ...newRequest, type })}
+                                                    className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                                                        newRequest.type === type
+                                                            ? "border-primary bg-primary/10"
+                                                            : "border-border hover:border-primary/50"
+                                                    }`}
+                                                >
+                                                    <div className={`p-2 rounded-lg ${config.bgColor}`}>
+                                                        <Icon className={`w-4 h-4 ${config.color}`} />
+                                                    </div>
+                                                    <span className="text-sm font-medium text-foreground">{type}</span>
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-foreground mb-2">Title</label>
+                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                        Title
+                                    </label>
                                     <input
                                         type="text"
                                         required
                                         value={newRequest.title}
                                         onChange={(e) => setNewRequest({ ...newRequest, title: e.target.value })}
-                                        className="w-full bg-background/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm"
+                                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm"
                                         placeholder="e.g. Renew Commercial License"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-foreground mb-2">Description</label>
+                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                        Description
+                                    </label>
                                     <textarea
                                         required
                                         value={newRequest.description}
                                         onChange={(e) => setNewRequest({ ...newRequest, description: e.target.value })}
-                                        className="w-full bg-background/50 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all min-h-[120px] text-sm resize-none"
+                                        className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all min-h-[100px] text-sm resize-none"
                                         placeholder="Describe your request in detail..."
                                     />
                                 </div>
 
-                                <div className="flex justify-end gap-3 pt-4">
+                                <div className="flex gap-3 pt-2">
                                     <button
                                         type="button"
                                         onClick={() => setIsRequestModalOpen(false)}
-                                        className="px-5 py-2.5 text-sm font-medium text-foreground hover:bg-secondary hover:text-secondary-foreground rounded-xl transition-colors"
+                                        className="flex-1 py-3 text-sm font-medium text-foreground bg-secondary hover:bg-secondary/80 rounded-xl transition-colors"
                                     >
                                         Cancel
                                     </button>
-                                    <button
-                                        type="submit"
-                                        className="btn-primary"
-                                    >
+                                    <button type="submit" className="flex-1 btn-primary">
                                         Submit Request
                                     </button>
                                 </div>
