@@ -383,7 +383,7 @@ export default function AboutPage() {
                                                 {member.specialties.map((specialty) => (
                                                     <span
                                                         key={specialty}
-                                                        className="text-xs px-2.5 py-1 rounded-full bg-secondary text-muted-foreground"
+                                                        className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20"
                                                     >
                                                         {specialty}
                                                     </span>
@@ -434,6 +434,63 @@ export default function AboutPage() {
                                 </div>
                             </div>
                         </motion.div>
+                    </div>
+                </section>
+
+                {/* About Footer Section */}
+                <section className="py-16 border-t border-border">
+                    <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                        <div className="grid md:grid-cols-3 gap-12">
+                            {/* Company Info */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                            >
+                                <h3 className="text-xl font-bold text-foreground mb-4">Makin Business Services</h3>
+                                <p className="text-muted-foreground mb-4">
+                                    Your trusted partner for business services in Saudi Arabia since 2014.
+                                </p>
+                                <div className="flex gap-3">
+                                    <a href="#" className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+                                        <Linkedin className="w-5 h-5" />
+                                    </a>
+                                    <a href="mailto:info@makin.sa" className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+                                        <Mail className="w-5 h-5" />
+                                    </a>
+                                </div>
+                            </motion.div>
+
+                            {/* Office Location */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.1 }}
+                            >
+                                <h3 className="text-xl font-bold text-foreground mb-4">Head Office</h3>
+                                <div className="space-y-2 text-muted-foreground">
+                                    <p>King Fahd Road, Al Olaya District</p>
+                                    <p>Riyadh 12211, Saudi Arabia</p>
+                                    <p className="text-primary font-medium">+966 11 XXX XXXX</p>
+                                </div>
+                            </motion.div>
+
+                            {/* Working Hours */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.2 }}
+                            >
+                                <h3 className="text-xl font-bold text-foreground mb-4">Working Hours</h3>
+                                <div className="space-y-2 text-muted-foreground">
+                                    <p>Sunday - Thursday</p>
+                                    <p className="text-foreground font-medium">8:00 AM - 5:00 PM</p>
+                                    <p className="text-sm mt-4">Friday & Saturday - Closed</p>
+                                </div>
+                            </motion.div>
+                        </div>
                     </div>
                 </section>
             </div>
