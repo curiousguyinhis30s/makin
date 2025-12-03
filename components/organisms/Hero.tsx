@@ -146,14 +146,14 @@ export default function Hero() {
                         {/* Badge */}
                         <motion.div variants={itemVariants} className="flex justify-center">
                             <motion.div
-                                className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-primary/10 border border-primary/20 text-xs md:text-sm font-medium text-foreground backdrop-blur-sm"
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-foreground backdrop-blur-sm"
                                 whileHover={{ scale: 1.05 }}
                                 transition={{ type: "spring", stiffness: 400 }}
                             >
-                                <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-                                Premier Business Solutions in KSA
+                                <Sparkles className="w-4 h-4 text-primary" />
+                                {t("hero.badge")}
                                 <motion.span
-                                    className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary"
+                                    className="w-2 h-2 rounded-full bg-primary"
                                     animate={{ scale: [1, 1.3, 1], opacity: [1, 0.7, 1] }}
                                     transition={{ duration: 2, repeat: Infinity }}
                                 />
